@@ -1,0 +1,10 @@
+%% -*- erlang -*-
+{application, erl_utils,
+ [{description, "Erlang Utilities"},
+  {vsn, "0.1.0"},
+  {modules, [record_utils, mnesia_utils]},
+  {registered, []},
+  {applications, [kernel, stdlib, sasl]},
+  {mod, {erl_utils_app, []}},
+  {env, []}
+]}.
