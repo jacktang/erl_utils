@@ -11,6 +11,9 @@
 %% API
 -export([record_to_proplist/2,
          record_to_proplist/3]).
+-export([proplist_to_record/3]).
+
+-include("record_utils.hrl").
 
 %%%===================================================================
 %%% API
@@ -40,6 +43,17 @@ record_to_proplist(Rec, Fields, RequiredFields)  -> % Rec should be a record
                          end
                  end, [[], []], RequiredFields),
     lists:zip(Fs, Vs).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+proplist_to_record(Record, Proplist, Fields) ->
+    [Tag| Values] = tuple_to_list(Record),
+    Defaults = lists:zip(Fields, Values),
+    L = lists:map(fun ({K,V}) -> proplists:get_value(K, Proplist, V) end, Defaults),
+    list_to_tuple([Tag|L]).
 
 %%%===================================================================
 %%% Internal functions
