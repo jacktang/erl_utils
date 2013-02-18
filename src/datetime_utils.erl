@@ -23,6 +23,7 @@
          utc_as_string/0,
          datetime_as_string/1]).
 -export([parse_date/2]).
+-export([beginning_of_day/1, end_of_day/1]).
 
 %%%===================================================================
 %%% API
@@ -97,9 +98,47 @@ parse_date(DateInput, 'yyyy-MM-dd' = _Formatter) ->
         true  -> Date;
         false -> throw(invalid_date)
     end;
-parse_date('yyyy-MM-dd', _Date) ->
-    throw(badarg).
+parse_date(DateInput, 'yyyyMMdd' = _Formatter) ->
+    DateStr = type_utils:any_to_list(DateInput),
+    ParseFun = fun(Start, Length) ->
+                       {I, _} = string:to_integer(string:substr(DateStr, Start, Length)),
+                       I
+               end,
+    Date = (catch {ParseFun(1, 4), ParseFun(5, 2), ParseFun(7, 2)}),
+    case catch calendar:valid_date(Date) of
+        {'EXIT', Reason} -> throw(Reason);
+        true -> Date;
+        false -> throw(invalid_date)
+    end;
+parse_date(_Date, Formatter) ->
+    throw({unsupported_formatter, Formatter}).
 
+
+%%--------------------------------------------------------------------
+%% @doc 
+%% @spec beginning_of_day(Input) -> Datetime
+%% @end
+%%--------------------------------------------------------------------
+beginning_of_day({date, Date}) ->
+    {Date, {0, 0, 0}};
+beginning_of_day({datetime, {Date, _Time}}) ->
+    {Date, {0, 0, 0}};
+beginning_of_day({Date, Formatter}) ->
+    {parse_date(Date, Formatter), {0, 0, 0}}.
+
+
+%%--------------------------------------------------------------------
+%% @doc 
+%% @spec beginning_of_day(Input) -> Datetime
+%% @end
+%%--------------------------------------------------------------------
+end_of_day({date, Date}) ->
+    {Date, {23, 59, 59}};
+end_of_day({datetime, {Date, _Time}}) ->
+    {Date, {23, 59, 59}};
+end_of_day({Date, Formatter}) ->
+    {parse_date(Date, Formatter), {23, 59, 59}}.
+    
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================

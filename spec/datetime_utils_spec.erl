@@ -34,6 +34,28 @@ spec() ->
                               Epoch = datetime_utils:localtime_to_epoch(LocalTime),
                               DateTime2 = datetime_utils:epoch_to_localtime(Epoch),
                               ?assertEqual(LocalTime, DateTime2)
-                      end)
+                      end),
 
+                    it("should be equal to {Date, {0,0,0}} in calcualting beginning of day",
+                       fun() ->
+                               BOD1 = datetime_utils:beginning_of_day({date, {2013, 10, 2}}),
+                               BOD2 = datetime_utils:beginning_of_day({datetime, {{2013,10,2}, {20, 0, 2}} }),
+                               BOD3 = datetime_utils:beginning_of_day({"20131002", 'yyyyMMdd'}),
+                               BOD = {{2013, 10, 2}, {0,0,0}},
+                               ?assertEqual(BOD1, BOD),
+                               ?assertEqual(BOD2, BOD),
+                               ?assertEqual(BOD3, BOD)
+                       end),
+                    
+                    it("should be equal to {Date, {23,59,59}} in calcualting end of day",
+                       fun() ->
+                               EOD1 = datetime_utils:end_of_day({date, {2013, 10, 2}}),
+                               EOD2 = datetime_utils:end_of_day({datetime, {{2013,10,2}, {20, 0, 2}} }),
+                               EOD3 = datetime_utils:end_of_day({"20131002", 'yyyyMMdd'}),
+                               EOD = {{2013, 10, 2}, {23,59,59}},
+                               ?assertEqual(EOD1, EOD),
+                               ?assertEqual(EOD2, EOD),
+                               ?assertEqual(EOD3, EOD)
+                       end)
+                    
             end).
