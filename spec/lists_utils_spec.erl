@@ -15,5 +15,11 @@ spec() ->
                        fun() ->
                                R = lists_utils:index_of(a, [a]),
                                ?assertEqual(1, R)
-                       end)
+                       end),
+
+                    it("should delete duplicated items",
+                      fun() ->
+                              R = lists_utils:uniq([1, 2, 3, 1, "a", "x", "a"]),
+                              ?assertEqual([3, 2, 1, "a", "x"], R)
+                      end)
             end).

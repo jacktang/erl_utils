@@ -10,6 +10,7 @@
 
 %% API
 -export([index_of/2]).
+-export([uniq/1]).
 
 %%%===================================================================
 %%% API
@@ -27,6 +28,17 @@ index_of(Item, List) -> index_of(Item, List, 1).
 index_of(_, [], _)  -> not_found;
 index_of(Item, [Item|_], Index) -> Index;
 index_of(Item, [_|Tl], Index) -> index_of(Item, Tl, Index+1).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+uniq(undefined) -> undefined;
+uniq([]) -> [];
+uniq(List) ->
+    Set = sets:from_list(List),
+    sets:to_list(Set).
 
 %%%===================================================================
 %%% Internal functions
