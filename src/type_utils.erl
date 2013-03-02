@@ -48,7 +48,7 @@ any_to_atom(Atom) when is_atom(Atom) ->
 any_to_atom(List) when is_list(List) ->
     list_to_atom(List);
 any_to_atom(Bin) when is_binary(Bin) ->
-    binary_to_list(Bin);
+    list_to_atom(any_to_list(Bin));
 any_to_atom(_) ->
     throw(badarg).
 
