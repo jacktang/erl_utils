@@ -67,7 +67,11 @@ any_to_binary(List) when is_list(List) ->
                  List -> B;
                  _ -> list_to_binary(List)
              end
-    end.
+    end;
+any_to_binary(Atom) when is_atom(Atom) ->
+    erlang:atom_to_binary(Atom, utf8);
+any_to_binary(_) ->
+    throw(badarg).
     
 
 %%--------------------------------------------------------------------
