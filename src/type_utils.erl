@@ -34,6 +34,8 @@ any_to_list(Bin) when is_binary(Bin) ->
     end;
 any_to_list(Atom) when is_atom(Atom) ->
     atom_to_list(Atom);
+any_to_list(Number) when is_integer(Number) ->
+    integer_to_list(Number);
 any_to_list(_) ->
     throw(badarg).
 
