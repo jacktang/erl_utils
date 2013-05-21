@@ -11,7 +11,8 @@
 %% API
 -export([any_to_list/1,
          any_to_atom/1,
-         any_to_binary/1]).
+         any_to_binary/1,
+         any_to_integer/1]).
 
 %%%===================================================================
 %%% API
@@ -28,7 +29,7 @@ any_to_list(undefined) ->
 any_to_list(List) when is_list(List) ->
     List;
 any_to_list(Bin) when is_binary(Bin) ->
-    case unicode:characters_to_binary(Bin,utf8,utf8) of
+    case unicode:characters_to_binary(Bin, utf8, utf8) of
         Bin -> unicode:characters_to_list(Bin);
         _ -> binary_to_list(Bin)
     end;
@@ -81,6 +82,15 @@ any_to_binary(_) ->
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
+any_to_integer(Int) when is_integer(Int) ->
+    Int;
+any_to_integer(List) when is_list(List) ->
+    list_to_integer(List);
+any_to_integer(Bin) when is_binary(Bin) ->
+    list_to_integer(any_to_list(Bin));
+any_to_integer(_) ->
+    throw(badarg).
+    
 
 
 %%%===================================================================
