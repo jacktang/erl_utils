@@ -27,6 +27,16 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+get_env(Par, Def) ->
+    case application:get_env(Par) of
+        undefined -> {ok, Def};
+        {ok, Val} -> {ok, Val}
+    end.     
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -41,14 +51,20 @@ start_supervisor(SupModule, Module, Args) ->
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
+one4one_supervisor(Specs) when is_list(Specs)->
+    gen_supervisor(one_for_one, Specs).
 one4one_supervisor(Spec) ->
-    gen_supervisor(one_for_one, Spec).
-
+    gen_supervisor(one_for_one, [Spec]).
+    
+one4one_supervisor(simple, Specs) when is_list(Specs) ->
+    gen_supervisor(simple_one_for_one, Specs).
 one4one_supervisor(simple, Spec) ->
-    gen_supervisor(simple_one_for_one, Spec).
+    gen_supervisor(simple_one_for_one, [Spec]).
 
+one4all_supervisor(Specs) when is_list(Specs) ->
+    gen_supervisor(one_for_all, Specs).
 one4all_supervisor(Spec) ->
-    gen_supervisor(one_for_all, Spec).
+    gen_supervisor(one_for_all, [Spec]).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -93,10 +109,9 @@ memory(App) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-
-gen_supervisor(RestartStrategy, Spec) ->
+gen_supervisor(RestartStrategy, Specs) when is_list(Specs)->
     SupFlags = {RestartStrategy, ?MAXR, ?MAXT},
-    {ok, {SupFlags, [Spec]}}.
+    {ok, {SupFlags, Specs}}.
 
 
 memory_tree(Sup) ->
