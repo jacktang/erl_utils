@@ -13,6 +13,7 @@
 -export([one4one_supervisor/1,
          one4one_supervisor/2,
          one4all_supervisor/1]).
+-export([get_env/2]).
 -export([supervisor_spec/3]).
 -export([child_spec/1,
          child_spec/2,
@@ -52,17 +53,17 @@ start_supervisor(SupModule, Module, Args) ->
 %% @end
 %%--------------------------------------------------------------------
 one4one_supervisor(Specs) when is_list(Specs)->
-    gen_supervisor(one_for_one, Specs).
+    gen_supervisor(one_for_one, Specs);
 one4one_supervisor(Spec) ->
     gen_supervisor(one_for_one, [Spec]).
     
 one4one_supervisor(simple, Specs) when is_list(Specs) ->
-    gen_supervisor(simple_one_for_one, Specs).
+    gen_supervisor(simple_one_for_one, Specs);
 one4one_supervisor(simple, Spec) ->
     gen_supervisor(simple_one_for_one, [Spec]).
 
 one4all_supervisor(Specs) when is_list(Specs) ->
-    gen_supervisor(one_for_all, Specs).
+    gen_supervisor(one_for_all, Specs);
 one4all_supervisor(Spec) ->
     gen_supervisor(one_for_all, [Spec]).
 
