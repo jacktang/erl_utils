@@ -17,7 +17,8 @@
 -export([supervisor_spec/3]).
 -export([child_spec/1,
          child_spec/2,
-         child_spec/3]).
+         child_spec/3,
+         child_spec/4]).
 
 -export([memory/1]).
 
@@ -79,14 +80,15 @@ supervisor_spec(SupModule, Module, Args) ->
      Restart, Shutdown, Type ,[SupModule]}.
 
 child_spec(Module) ->
-    child_spec(Module, []).
-
-child_spec(Module, Args) ->
+    child_spec(Module, Module, []).
+child_spec(Name, Module) ->
+    child_spec(Name, Module, []).
+child_spec(Name, Module, Args) ->
     child_spec(Module, Args, temporary).
 
-child_spec(Module, Args, RestartStrategy) ->
+child_spec(Name, Module, Args, RestartStrategy) ->
     {Restart, Shutdown, Type} = {RestartStrategy, 2000, worker},
-    {undefined,
+    {Name,
      {Module, start_link, Args},
      Restart, Shutdown, Type, [Module]}.
 
