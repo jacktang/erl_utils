@@ -16,9 +16,9 @@
 -export([get_env/2]).
 -export([supervisor_spec/3]).
 -export([child_spec/1,
-         child_spec/2,
-         child_spec/3,
-         child_spec/4]).
+         child_spec/2]).
+-export([dynamic_child_spec/1,
+         dynamic_child_spec/2]).
 
 -export([memory/1]).
 
@@ -80,11 +80,14 @@ supervisor_spec(SupModule, Module, Args) ->
      Restart, Shutdown, Type ,[SupModule]}.
 
 child_spec(Module) ->
-    child_spec(Module, Module, []).
-child_spec(Name, Module) ->
-    child_spec(Name, Module, []).
-child_spec(Name, Module, Args) ->
-    child_spec(Name, Module, Args, temporary).
+    child_spec(Module, []).
+child_spec(Module, Args) ->
+    child_spec(Module, Module, Args, temporary).
+
+dynamic_child_spec(Module) ->
+    dynamic_child_spec(Module, []).
+dynamic_child_spec(Module, Args) ->
+    child_spec(undefined, Module, Args, temporary).
 
 child_spec(Name, Module, Args, RestartStrategy) ->
     {Restart, Shutdown, Type} = {RestartStrategy, 2000, worker},
@@ -92,6 +95,8 @@ child_spec(Name, Module, Args, RestartStrategy) ->
      {Module, start_link, Args},
      Restart, Shutdown, Type, [Module]}.
 
+
+    
 
 %%--------------------------------------------------------------------
 %% @doc
