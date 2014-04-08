@@ -84,7 +84,7 @@ child_spec(Module) ->
 child_spec(Name, Module) ->
     child_spec(Name, Module, []).
 child_spec(Name, Module, Args) ->
-    child_spec(Module, Args, temporary).
+    child_spec(Name, Module, Args, temporary).
 
 child_spec(Name, Module, Args, RestartStrategy) ->
     {Restart, Shutdown, Type} = {RestartStrategy, 2000, worker},
