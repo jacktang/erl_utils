@@ -92,6 +92,8 @@ any_to_integer(_) ->
     throw(badarg).
     
 
+md5_hex(S) when is_list(S) ->
+    lists:flatten([io_lib:format("~2.16.0b", [C]) || <<C>> <= erlang:md5(S)]).
 
 %%%===================================================================
 %%% Internal functions
