@@ -11,6 +11,7 @@
 %% API
 -export([index_of/2]).
 -export([uniq/1]).
+-export([droplast/1, last/1]).
 
 %%%===================================================================
 %%% API
@@ -39,6 +40,19 @@ uniq([]) -> [];
 uniq(List) ->
     Set = sets:from_list(List),
     sets:to_list(Set).
+
+
+%% This is the simple recursive implementation
+%% reverse(tl(reverse(L))) is faster on average,
+%% but creates more garbage.
+droplast([_T])  -> [];
+droplast([H|T]) -> [H|droplast(T)].
+
+%% last(List) returns the last element in a list.
+last([E|Es]) -> last(E, Es).
+
+last(_, [E|Es]) -> last(E, Es);
+last(E, []) -> E.
 
 %%%===================================================================
 %%% Internal functions
