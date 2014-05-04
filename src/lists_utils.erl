@@ -12,6 +12,7 @@
 -export([index_of/2]).
 -export([uniq/1]).
 -export([droplast/1, last/1]).
+-export([split/2, split/3]).
 
 %%%===================================================================
 %%% API
@@ -54,6 +55,31 @@ last([E|Es]) -> last(E, Es).
 last(_, [E|Es]) -> last(E, Es);
 last(E, []) -> E.
 
+
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+split(N, List) ->
+    do_split(N, List, [], undefined).
+
+split(N, List, Fun) ->
+    do_split(N, List, [], Fun).
+
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+do_split(N, List, Acc, Fun) when length(List) < N ->
+    R = case erlang:is_function(Fun, 1) of
+            true  -> Fun(List);
+            false -> List
+        end,
+    lists:append(Acc, [R]);
+do_split(N, List, Acc, Fun) ->
+    {List2, List3} = lists:split(N, List),
+    R = case erlang:is_function(Fun, 1) of
+            true  -> Fun(List2);
+            false -> List2
+        end,
+    do_split(N, List3, lists:append(Acc, [R]), Fun).
