@@ -9,6 +9,7 @@
 -module(process_utils).
 
 %% API
+-export([generate_name/2]).
 -export([to_pid/1]).
 -export([state/1,
          state/2]).
@@ -16,6 +17,17 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc
+%% process_utils:take_name(?MODULE, Data)
+%% 
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+generate_name(Namespace, Data) ->
+    list_to_atom(type_utils:any_to_list(Namespace) ++ "_" ++
+                 integer_to_list(erlang:phash2(Data))).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -32,7 +44,8 @@ to_pid(PName) when is_atom(PName) ->
 
 %%--------------------------------------------------------------------
 %% @doc
-%% process_utils:to_pid("<0.4.1>")
+%% Pid = process_utils:to_pid("<0.4.1>"),
+%% process_utils:register_name(Pid).
 %% 
 %% @spec
 %% @end
