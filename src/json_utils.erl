@@ -20,8 +20,6 @@
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
-get_value(JSONStr, Key) ->
-    ok.
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -29,20 +27,24 @@ get_value(JSONStr, Key) ->
 %% @end
 %%--------------------------------------------------------------------
 to_record({obj, Values}, Fallback, Fields) ->  % rfc4627
-    list_to_tuple([element(1, Fallback) | decode_record_fields(Values, Fallback, 2, Fields)]);
+    list_to_tuple([element(1, Fallback) | decode_record_fields(Values, Fallback, 2, Fields, rfc4627)]);
 
 to_record({struct, Values}, Fallback, Fields) -> % mochijson2
-    list_to_tuple([element(1, Fallback) | decode_record_fields(Values, Fallback, 2, Fields)]).
+    list_to_tuple([element(1, Fallback) | decode_record_fields(Values, Fallback, 2, Fields, mochijson2)]).
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-decode_record_fields(_Values, _Fallback, _Index, []) ->
+decode_record_fields(_Values, _Fallback, _Index, [], _Encoder) ->
     [];
-decode_record_fields(Values, Fallback, Index, [Field | Rest]) ->
-    [case lists:keysearch(atom_to_list(Field), 1, Values) of
-	 {value, {_, Value}} ->
-	     Value;
-	 false ->
-	     element(Index, Fallback)
-     end | decode_record_fields(Values, Fallback, Index + 1, Rest)].
+decode_record_fields(Values, Fallback, Index, [Field | Rest], Encoder) ->
+    Field2 = case Encoder of
+                 rfc4627 -> atom_to_list(Field);
+                 _       -> atom_to_binary(Field, unicode)
+             end,
+    [case lists:keysearch(Field2, 1, Values) of
+         {value, {_, Value}} ->
+             Value;
+         false ->
+             element(Index, Fallback)
+     end | decode_record_fields(Values, Fallback, Index + 1, Rest, Encoder)].
