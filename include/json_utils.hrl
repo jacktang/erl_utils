@@ -1,2 +1,2 @@
 -define(json_to_record(RecAtom, Rec),
-        rfc4627:to_record(Rec, #RecAtom{}, record_info(fields, RecAtom))).
+        json_utils:to_record(Rec, #RecAtom{}, record_info(fields, RecAtom))).
