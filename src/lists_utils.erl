@@ -50,6 +50,7 @@ droplast([_T])  -> [];
 droplast([H|T]) -> [H|droplast(T)].
 
 %% last(List) returns the last element in a list.
+last([])  -> undefined.
 last([E|Es]) -> last(E, Es).
 
 last(_, [E|Es]) -> last(E, Es);

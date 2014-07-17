@@ -86,7 +86,7 @@ datetime_as_string({{Y, M, D} = _Date, {HH, MM, SS} = _Time}) ->
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
-parse_date(DateInput, 'yyyy-MM-dd' = _Formatter) ->
+parse_date(DateInput, 'yyyy-mm-dd' = _Formatter) ->
     DateStr = type_utils:any_to_list(DateInput),
     ParseFun = fun(Start, Length) ->
                     {I, _} = string:to_integer(string:substr(DateStr, Start, Length)),
@@ -98,7 +98,7 @@ parse_date(DateInput, 'yyyy-MM-dd' = _Formatter) ->
         true  -> Date;
         false -> throw(invalid_date)
     end;
-parse_date(DateInput, 'yyyyMMdd' = _Formatter) ->
+parse_date(DateInput, 'yyyymmdd' = _Formatter) ->
     DateStr = type_utils:any_to_list(DateInput),
     ParseFun = fun(Start, Length) ->
                        {I, _} = string:to_integer(string:substr(DateStr, Start, Length)),
