@@ -16,7 +16,8 @@
 -export([get_env/2]).
 -export([supervisor_spec/3]).
 -export([child_spec/1,
-         child_spec/2]).
+         child_spec/2,
+         child_spec/4]).
 -export([dynamic_child_spec/1,
          dynamic_child_spec/2]).
 
