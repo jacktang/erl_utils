@@ -15,15 +15,21 @@
 -module(datetime_utils).
 
 %% API
--export([epoch/0, now_to_seconds/1]).
--export([epoch_to_now/1,
+-export([epoch/0,
+         date_to_epoch/1,
+         datetime_to_epoch/1,
          localtime_to_epoch/1,
+         now_to_seconds/1]).
+-export([epoch_to_now/1,
+         epoch_to_date/1,
          epoch_to_localtime/1]).
 -export([localtime_as_string/0,
          utc_as_string/0,
          datetime_as_string/1]).
 -export([parse_date/2]).
 -export([beginning_of_day/1, end_of_day/1]).
+-export([is_older_by/3, is_sooner_by/3]).
+-export([subtract/2, add/2]).
 
 %%%===================================================================
 %%% API
@@ -46,9 +52,19 @@ now_to_seconds({Mega, Sec, _}) ->
 epoch_to_now(Epoch) ->
     {Epoch div 1000000, Epoch rem 1000000, 0}.
 
+epoch_to_date(Epoch) ->
+    {Date, _Time} = calendar:now_to_datetime({Epoch div 1000000, Epoch rem 1000000, 0}),
+    Date.
+
 epoch_to_localtime(Epoch) ->
     Now = epoch_to_now(Epoch),
     calendar:now_to_local_time(Now).
+
+
+date_to_epoch(Date) ->
+    datetime_to_epoch({Date, {0,0,0} }).
+datetime_to_epoch({Date, Time}) ->
+    gregorian_seconds_to_epoch(calendar:datetime_to_gregorian_seconds({Date, Time})).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -129,7 +145,7 @@ beginning_of_day({Date, Formatter}) ->
 
 %%--------------------------------------------------------------------
 %% @doc 
-%% @spec beginning_of_day(Input) -> Datetime
+%% @spec end_of_day(Input) -> Datetime
 %% @end
 %%--------------------------------------------------------------------
 end_of_day({date, Date}) ->
@@ -138,7 +154,66 @@ end_of_day({datetime, {Date, _Time}}) ->
     {Date, {23, 59, 59}};
 end_of_day({Date, Formatter}) ->
     {parse_date(Date, Formatter), {23, 59, 59}}.
-    
+
+%%--------------------------------------------------------------------
+%% @doc 
+%% @spec is_older_by
+%% @end
+%%--------------------------------------------------------------------
+is_older_by(T1, T2, {days, N}) ->
+    N1 = day_difference(T1, T2),
+    case N1 of
+        N2 when (-N < N2) ->
+            true;
+        _ ->
+            false
+    end.
+
+%%--------------------------------------------------------------------
+%% @doc 
+%% @spec is_older_by
+%% @end
+%%--------------------------------------------------------------------
+is_sooner_by(T1, T2, {days, N}) ->
+    case day_difference(T1, T2) of
+        N1 when N > N1 ->
+            true;
+        _ ->
+            false
+    end.
+
+%%--------------------------------------------------------------------
+%% @doc 
+%% @spec subtract
+%% @end
+%%--------------------------------------------------------------------
+subtract(Date, {days, N}) ->
+    add(Date, {days, -N});
+
+subtract(Epoch, {months, Months}) when is_integer(Epoch) ->
+    date_to_epoch(subtract(epoch_to_date(Epoch), {months, Months}));
+
+subtract({Y, M, D}, {months, Month}) when Month >= M ->
+    update_last_day({Y - (Month - M) div 12 -1, 12 - (Month - M) rem 12 , D});
+subtract({Y, M, D}, {months, Month}) when is_integer(M) ->
+    update_last_day({Y, M - Month, D}).
+
+%%--------------------------------------------------------------------
+%% @doc 
+%% @spec add
+%% @end
+%%--------------------------------------------------------------------
+add(Epoch, Diff) when is_integer(Epoch) ->
+    date_to_epoch(add(epoch_to_date(Epoch), Diff));
+
+add({_Y, _M, _D} = Date, {days, N}) ->
+    New = calendar:date_to_gregorian_days(Date) + N,
+    calendar:gregorian_days_to_date(New);
+
+add({Y, M, D}, {months, Month}) ->
+    update_last_day({Y + (M + Month - 1) div 12, (M + Month - 1) rem 12 + 1, D}).
+
+
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
@@ -148,3 +223,21 @@ epoch_gregorian_seconds() ->
 gregorian_seconds_to_epoch(Secs) ->
     EpochSecs = epoch_gregorian_seconds(),
     Secs - EpochSecs.
+
+day_difference({D1, _}, D2) ->
+    day_difference(D1, D2);
+day_difference(D1, {D2, _}) ->
+    day_difference(D1, D2);
+day_difference(D1, D2) ->
+    Days1 = calendar:date_to_gregorian_days(D1),
+    Days2 = calendar:date_to_gregorian_days(D2),
+    Days1 - Days2.
+
+update_last_day({Y, M, D}) ->
+    LastDayOfMonth = calendar:last_day_of_the_month(Y, M),
+    case D > LastDayOfMonth of
+        true ->
+            {Y, M, LastDayOfMonth};
+        false ->
+            {Y, M, D}
+    end.
