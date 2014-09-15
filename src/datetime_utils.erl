@@ -156,14 +156,14 @@ end_of_day({Date, Formatter}) ->
     {parse_date(Date, Formatter), {23, 59, 59}}.
 
 %%--------------------------------------------------------------------
-%% @doc 
+%% @doc
 %% @spec is_older_by
 %% @end
 %%--------------------------------------------------------------------
 is_older_by(T1, T2, {days, N}) ->
     N1 = day_difference(T1, T2),
     case N1 of
-        N2 when (-N < N2) ->
+        N2 when (-N > N2) ->
             true;
         _ ->
             false
