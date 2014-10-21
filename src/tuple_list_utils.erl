@@ -9,6 +9,7 @@
 -module(tuple_list_utils).
 
 %% API
+-export([keyfind/2, keyfind/3]).
 -export([atomize_key/1]).
 
 %%%===================================================================
@@ -20,9 +21,18 @@
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
-atomize_key(Tuplelist) ->
-    atomize_key(Tuplelist, []).
-    
+atomize_key(TupleList) ->
+    atomize_key(TupleList, []).
+
+
+keyfind(Key, TupleList) when is_list(TupleList) ->
+    keyfind(Key, undefined, TupleList).
+keyfind(Key, Def, TupleList) when is_list(TupleList) ->
+    case lists:keyfind(Key, 1, TupleList) of
+        false        -> {Key, Def};
+        {Key, Value} -> {Key, Value}
+    end.
+             
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
