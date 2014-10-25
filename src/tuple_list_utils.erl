@@ -10,6 +10,7 @@
 
 %% API
 -export([keyfind/2, keyfind/3]).
+-export([update/2]).
 -export([atomize_key/1]).
 
 %%%===================================================================
@@ -24,7 +25,11 @@
 atomize_key(TupleList) ->
     atomize_key(TupleList, []).
 
-
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
 keyfind(Key, TupleList) when is_list(TupleList) ->
     keyfind(Key, undefined, TupleList).
 keyfind(Key, Def, TupleList) when is_list(TupleList) ->
@@ -32,6 +37,16 @@ keyfind(Key, Def, TupleList) when is_list(TupleList) ->
         false        -> {Key, Def};
         {Key, Value} -> {Key, Value}
     end.
+
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+update({Key, _} = Item, TupleList) ->
+    NTupleList = lists:keydelete(Key, 1, TupleList),
+    [ Item | NTupleList ].
+    
              
 %%%===================================================================
 %%% Internal functions
