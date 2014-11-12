@@ -41,7 +41,7 @@
 %% @end
 %%--------------------------------------------------------------------
 epoch() ->
-    now_to_seconds(now()).
+    now_to_seconds(os:timestamp()).
 localtime_to_epoch({_D, _T} = DateTime) ->
     [UTCTime] = calendar:local_time_to_universal_time_dst(DateTime),
     gregorian_seconds_to_epoch(calendar:datetime_to_gregorian_seconds(UTCTime)).
@@ -80,7 +80,7 @@ localtime_as_string() ->
 %% @end
 %%--------------------------------------------------------------------
 utc_as_string() ->
-    datetime_as_string(calendar:now_to_universal_time(now())).
+    datetime_as_string(calendar:now_to_universal_time(os:timestamp())).
 
 %%--------------------------------------------------------------------
 %% @doc

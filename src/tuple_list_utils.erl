@@ -35,7 +35,8 @@ keyfind(Key, TupleList) when is_list(TupleList) ->
 keyfind(Key, Def, TupleList) when is_list(TupleList) ->
     case lists:keyfind(Key, 1, TupleList) of
         false        -> {Key, Def};
-        {Key, Value} -> {Key, Value}
+        {Key, Value} -> {Key, Value};
+        Tuple        -> Tuple
     end.
 
 %%--------------------------------------------------------------------
