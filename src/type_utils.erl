@@ -14,6 +14,7 @@
          any_to_binary/1,
          any_to_integer/1,
          md5_hex/1]).
+-export([if_undefined_then_default/2]).
 
 %%%===================================================================
 %%% API
