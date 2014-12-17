@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 15 Dec 2014 by Jack Tang <jack@taodinet.com>
 %%%-------------------------------------------------------------------
--module(maps_utils).
+-module(map_utils).
 
 %% API
 -export([append/3]).
