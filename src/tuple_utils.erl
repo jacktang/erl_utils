@@ -20,10 +20,12 @@
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
-value(Field, Record, Fields) ->
+value(Field, Record, Fields) when is_tuple(Record) ->
     [_RecAtom | RecVals] = tuple_to_list(Record),
     RecWithFields = lists:zip(Fields, RecVals),
-    proplists:get_value(Field, RecWithFields, undefined).
+    proplists:get_value(Field, RecWithFields, undefined);
+value(_Field, _Record, _Fields) ->
+    undefined.
 
 %%%===================================================================
 %%% Internal functions
