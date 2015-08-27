@@ -1,20 +1,28 @@
 %%%-------------------------------------------------------------------
-%%% @author Chen Slepher <slepher@issac.local>
-%%% @copyright (C) 2015, Chen Slepher
+%%% @author Jack Tang <jack@taodinet.com>
+%%% @copyright (C) 2014, Jack Tang
 %%% @doc
 %%%
 %%% @end
-%%% Created : 27 Aug 2015 by Chen Slepher <slepher@issac.local>
+%%% Created :  8 May 2014 by Jack Tang <jack@taodinet.com>
 %%%-------------------------------------------------------------------
 -module(supervisor_utils).
 
 %% API
 -export([start_child/2, start_child/3,
          start_no_offending_child/2, start_no_offending_child/3]).
+-export([grep_children/1]).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec
+%% @end
+%%--------------------------------------------------------------------
+
 start_child(Sup, Args) ->
     case supervisor:start_child(Sup, Args) of
         {ok, Handler} ->
@@ -59,11 +67,11 @@ start_no_offending_child(PName, Sup, Args) ->
             {ok, PId}
     end.
 
-%%--------------------------------------------------------------------
-%% @doc
-%% @spec
-%% @end
-%%--------------------------------------------------------------------
+grep_children(RegExp) ->
+    ok.
+
+grep_children(RegExp, Fun) ->
+    ok.
 
 %%%===================================================================
 %%% Internal functions
