@@ -19,7 +19,7 @@
          child_spec/2,
          child_spec/3,
          child_spec/4,
-         no_offending_child_spec/2,
+         no_offending_child_spec/2
         ]).
 -export([dynamic_child_spec/1,
          dynamic_child_spec/2,
