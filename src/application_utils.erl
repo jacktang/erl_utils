@@ -18,7 +18,9 @@
 -export([child_spec/1,
          child_spec/2,
          child_spec/3,
-         child_spec/4]).
+         child_spec/4,
+         no_offending_child_spec/2,
+        ]).
 -export([dynamic_child_spec/1,
          dynamic_child_spec/2,
          dynamic_child_spec/3]).
@@ -41,7 +43,7 @@ get_env(Par, Def) ->
     case application:get_env(Par) of
         undefined -> {ok, Def};
         {ok, Val} -> {ok, Val}
-    end.     
+    end.
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -60,7 +62,7 @@ one4one_supervisor(Specs) when is_list(Specs)->
     gen_supervisor(one_for_one, Specs);
 one4one_supervisor(Spec) ->
     gen_supervisor(one_for_one, [Spec]).
-    
+
 one4one_supervisor(simple, Specs) when is_list(Specs) ->
     gen_supervisor(simple_one_for_one, Specs);
 one4one_supervisor(simple, Spec) ->
@@ -88,23 +90,25 @@ child_spec(Module, Args) ->
     child_spec(Module, Module, Args, transient).
 child_spec(Module, Args, RestartPolicy) ->
     child_spec(Module, Module, Args, RestartPolicy).  % Restart = transient, temporary
-    
+
 dynamic_child_spec(Module) ->
     dynamic_child_spec(Module, []).
 dynamic_child_spec(Module, Args) ->
     child_spec(undefined, Module, Args, transient).
 dynamic_child_spec(Module, Args, RestartPolicy) ->
     child_spec(undefined, Module, Args, RestartPolicy).
-    
+
 child_spec(Name, Module, Args, RestartPolicy) ->
     {Restart, Shutdown, Type} = {RestartPolicy, 2000, worker},
     {Name,
      {Module, start_link, Args},
      Restart, Shutdown, Type, [Module]}.
 
-
-    
-
+no_offending_child_spec(Module, Args) ->
+    {Restart, Shutdown, Type} = {transient, 2000, supervisor},
+    {undefined,
+     {offending_child_supervisor, start_link, [Module, Args]},
+     Restart, Shutdown, Type, [Module]}.
 %%--------------------------------------------------------------------
 %% @doc
 %% @spec
@@ -131,7 +135,7 @@ gen_supervisor(RestartStrategy, Specs) when is_list(Specs)->
 
 memory_tree(Sup) ->
     Infos = supervisor:which_children(Sup),
-    {M, E} = 
+    {M, E} =
         lists:foldl(
           fun({Name, PId, Type, _}, {Total, Memories}) ->
                   case Type of
@@ -160,4 +164,4 @@ memory_tree(Sup) ->
                    end
            end, E),
     NNE = lists:reverse(lists:keysort(2, NE)),
-    {M, NNE}.                                
+    {M, NNE}.
