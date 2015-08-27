@@ -22,7 +22,6 @@
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
-
 start_child(Sup, Args) ->
     case supervisor:start_child(Sup, Args) of
         {ok, Handler} ->
@@ -62,7 +61,7 @@ start_no_offending_child(Sup, Args) ->
 start_no_offending_child(PName, Sup, Args) ->
     case whereis(PName) of
         undefined ->
-            start_protected_child(Sup, Args);
+            start_no_offending_child(Sup, Args);
         PId when is_pid(PId) ->
             {ok, PId}
     end.
