@@ -51,7 +51,7 @@ get_env(Par, Def) ->
 %% @end
 %%--------------------------------------------------------------------
 start_supervisor(SupModule, Module, Args) ->
-    supervisor:start_link({local, Module}, SupModule, [Module | Args]).
+    supervisor2:start_link({local, Module}, SupModule, [Module | Args]).
 
 %%--------------------------------------------------------------------
 %% @doc
