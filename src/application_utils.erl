@@ -9,7 +9,7 @@
 -module(application_utils).
 
 %% API
--export([start_supervisor/3]).
+-export([start_supervisor/3, start_supervisor2/3]).
 -export([one4one_supervisor/1,
          one4one_supervisor/2,
          one4all_supervisor/1]).
@@ -51,6 +51,9 @@ get_env(Par, Def) ->
 %% @end
 %%--------------------------------------------------------------------
 start_supervisor(SupModule, Module, Args) ->
+    supervisor:start_link({local, Module}, SupModule, [Module | Args]).
+
+start_supervisor2(SupModule, Module, Args) ->
     supervisor2:start_link({local, Module}, SupModule, [Module | Args]).
 
 %%--------------------------------------------------------------------
