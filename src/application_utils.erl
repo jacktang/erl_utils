@@ -90,7 +90,7 @@ supervisor_spec(SupModule, Module, Args) ->
 supervisor2_spec(SupModule, Module, Args) ->
     {Restart, Shutdown, Type} = {transient, infinity, supervisor},
     {Module,
-     {?MODULE, start_supervisor, [SupModule, Module, Args]},
+     {?MODULE, start_supervisor2, [SupModule, Module, Args]},
      Restart, Shutdown, Type ,[SupModule]}.
 
 child_spec(Module) ->
