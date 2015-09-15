@@ -14,7 +14,7 @@
          one4one_supervisor/2,
          one4all_supervisor/1]).
 -export([get_env/2]).
--export([supervisor_spec/3]).
+-export([supervisor_spec/3, supervisor2_spec/3]).
 -export([child_spec/1,
          child_spec/2,
          child_spec/3,
@@ -82,6 +82,12 @@ one4all_supervisor(Spec) ->
 %% @end
 %%--------------------------------------------------------------------
 supervisor_spec(SupModule, Module, Args) ->
+    {Restart, Shutdown, Type} = {transient, infinity, supervisor},
+    {Module,
+     {?MODULE, start_supervisor, [SupModule, Module, Args]},
+     Restart, Shutdown, Type ,[SupModule]}.
+
+supervisor2_spec(SupModule, Module, Args) ->
     {Restart, Shutdown, Type} = {transient, infinity, supervisor},
     {Module,
      {?MODULE, start_supervisor, [SupModule, Module, Args]},
