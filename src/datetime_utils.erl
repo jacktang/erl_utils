@@ -22,6 +22,7 @@
          now_to_seconds/1]).
 -export([epoch_to_now/1,
          epoch_to_date/1,
+         epoch_to_datetime/1,
          epoch_to_localtime/1]).
 -export([localtime_as_string/0,
          utc_as_string/0,
@@ -47,13 +48,15 @@ localtime_to_epoch({_D, _T} = DateTime) ->
     gregorian_seconds_to_epoch(calendar:datetime_to_gregorian_seconds(UTCTime)).
 
 now_to_seconds({Mega, Sec, _}) ->
-    (Mega * 1000000) + Sec.   
-  
+    (Mega * 1000000) + Sec.
+
 epoch_to_now(Epoch) ->
     {Epoch div 1000000, Epoch rem 1000000, 0}.
 
+epoch_to_datetime(Epoch) ->
+    calendar:now_to_datetime({Epoch div 1000000, Epoch rem 1000000, 0}).
 epoch_to_date(Epoch) ->
-    {Date, _Time} = calendar:now_to_datetime({Epoch div 1000000, Epoch rem 1000000, 0}),
+    {Date, _Time} = epoch_to_date(Epoch),
     Date.
 
 epoch_to_localtime(Epoch) ->
@@ -131,7 +134,7 @@ parse_date(_Date, Formatter) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc 
+%% @doc
 %% @spec beginning_of_day(Input) -> Datetime
 %% @end
 %%--------------------------------------------------------------------
@@ -144,7 +147,7 @@ beginning_of_day({Date, Formatter}) ->
 
 
 %%--------------------------------------------------------------------
-%% @doc 
+%% @doc
 %% @spec end_of_day(Input) -> Datetime
 %% @end
 %%--------------------------------------------------------------------
@@ -170,7 +173,7 @@ is_older_by(T1, T2, {days, N}) ->
     end.
 
 %%--------------------------------------------------------------------
-%% @doc 
+%% @doc
 %% @spec is_older_by
 %% @end
 %%--------------------------------------------------------------------
@@ -183,7 +186,7 @@ is_sooner_by(T1, T2, {days, N}) ->
     end.
 
 %%--------------------------------------------------------------------
-%% @doc 
+%% @doc
 %% @spec subtract
 %% @end
 %%--------------------------------------------------------------------
@@ -199,7 +202,7 @@ subtract({Y, M, D}, {months, Month}) when is_integer(M) ->
     update_last_day({Y, M - Month, D}).
 
 %%--------------------------------------------------------------------
-%% @doc 
+%% @doc
 %% @spec add
 %% @end
 %%--------------------------------------------------------------------
