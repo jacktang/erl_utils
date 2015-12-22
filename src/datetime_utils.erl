@@ -28,7 +28,7 @@
          utc_as_string/0,
          datetime_as_string/1]).
 -export([parse_date/2]).
--export([beginning_of_day/1, end_of_day/1]).
+-export([beginning_of_day/1, midday/1, end_of_day/1]).
 -export([is_older_by/3, is_sooner_by/3]).
 -export([subtract/2, add/2]).
 
