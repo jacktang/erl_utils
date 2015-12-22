@@ -145,6 +145,17 @@ beginning_of_day({datetime, {Date, _Time}}) ->
 beginning_of_day({Date, Formatter}) ->
     {parse_date(Date, Formatter), {0, 0, 0}}.
 
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec midday(Input) -> Datetime
+%% @end
+%%--------------------------------------------------------------------
+midday({date, Date}) ->
+    {Date, {12, 0, 0}};
+midday({datetime, {Date, _T}}) ->
+    {Date, {12, 0, 0}};
+midday({Date, Formatter}) ->
+    {parse_date(Date, Formatter), {12, 0, 0}}.
 
 %%--------------------------------------------------------------------
 %% @doc
