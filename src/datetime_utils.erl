@@ -30,7 +30,7 @@
          utc_as_string/0,
          datetime_as_string/1]).
 -export([parse_date/2]).
--export([beginning_of_day/1, end_of_day/1]).
+-export([beginning_of_day/1, midday/1, end_of_day/1]).
 -export([is_older_by/3, is_sooner_by/3]).
 -export([subtract/2, add/2]).
 
@@ -150,6 +150,17 @@ beginning_of_day({datetime, {Date, _Time}}) ->
 beginning_of_day({Date, Formatter}) ->
     {parse_date(Date, Formatter), {0, 0, 0}}.
 
+%%--------------------------------------------------------------------
+%% @doc
+%% @spec midday(Input) -> Datetime
+%% @end
+%%--------------------------------------------------------------------
+midday({date, Date}) ->
+    {Date, {12, 0, 0}};
+midday({datetime, {Date, _T}}) ->
+    {Date, {12, 0, 0}};
+midday({Date, Formatter}) ->
+    {parse_date(Date, Formatter), {12, 0, 0}}.
 
 %%--------------------------------------------------------------------
 %% @doc
