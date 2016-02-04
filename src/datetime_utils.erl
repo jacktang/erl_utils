@@ -23,8 +23,7 @@
 -export([epoch_to_now/1,
          epoch_to_date/1,
          epoch_to_datetime/1,
-         epoch_to_localtime/1,
-         epoch_to_utctime/1
+         epoch_to_localtime/1
         ]).
 -export([localtime_as_string/0,
          utc_as_string/0,
