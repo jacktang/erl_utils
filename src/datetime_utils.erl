@@ -23,7 +23,8 @@
 -export([epoch_to_now/1,
          epoch_to_date/1,
          epoch_to_datetime/1,
-         epoch_to_localtime/1]).
+         epoch_to_localtime/1
+        ]).
 -export([localtime_as_string/0,
          utc_as_string/0,
          datetime_as_string/1]).
@@ -63,6 +64,9 @@ epoch_to_localtime(Epoch) ->
     Now = epoch_to_now(Epoch),
     calendar:now_to_local_time(Now).
 
+epoch_to_utctime(Epoch) ->
+    Now = epoch_to_now(Epoch),
+    calendar:now_to_universal_time(Now).
 
 date_to_epoch(Date) ->
     datetime_to_epoch({Date, {0,0,0} }).
