@@ -56,7 +56,7 @@ epoch_to_now(Epoch) ->
 epoch_to_datetime(Epoch) ->
     calendar:now_to_datetime({Epoch div 1000000, Epoch rem 1000000, 0}).
 epoch_to_date(Epoch) ->
-    {Date, _Time} = epoch_to_date(Epoch),
+    {Date, _Time} = epoch_to_datetime(Epoch),
     Date.
 
 epoch_to_localtime(Epoch) ->
