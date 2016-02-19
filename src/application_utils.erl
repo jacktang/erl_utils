@@ -9,12 +9,16 @@
 -module(application_utils).
 
 %% API
--export([start_supervisor/3, start_supervisor2/3]).
+-export([start_supervisor/3,
+         start_supervisor2/3,
+         start_timed_supervisor/3]).
 -export([one4one_supervisor/1,
          one4one_supervisor/2,
          one4all_supervisor/1]).
 -export([get_env/2]).
--export([supervisor_spec/3, supervisor2_spec/3]).
+-export([supervisor_spec/3,
+         supervisor2_spec/3,
+         timed_supervisor_spec/3]).
 -export([child_spec/1,
          child_spec/2,
          child_spec/3,
@@ -56,6 +60,9 @@ start_supervisor(SupModule, Module, Args) ->
 start_supervisor2(SupModule, Module, Args) ->
     supervisor2:start_link({local, Module}, SupModule, [Module | Args]).
 
+start_timed_supervisor(SupModule, Module, Args) ->
+    timed_supervisor:start_link({local, Module}, SupModule, [Module | Args]).
+
 %%--------------------------------------------------------------------
 %% @doc
 %% @spec
@@ -83,15 +90,22 @@ one4all_supervisor(Spec) ->
 %%--------------------------------------------------------------------
 supervisor_spec(SupModule, Module, Args) ->
     {Restart, Shutdown, Type} = {transient, infinity, supervisor},
+    % TODO: refactor in R18
     {Module,
      {?MODULE, start_supervisor, [SupModule, Module, Args]},
-     Restart, Shutdown, Type ,[SupModule]}.
+     Restart, Shutdown, Type, [SupModule]}.
 
 supervisor2_spec(SupModule, Module, Args) ->
     {Restart, Shutdown, Type} = {transient, infinity, supervisor},
     {Module,
      {?MODULE, start_supervisor2, [SupModule, Module, Args]},
-     Restart, Shutdown, Type ,[SupModule]}.
+     Restart, Shutdown, Type, [SupModule]}.
+
+timed_supervisor_spec(SupModule, Module, Args) ->
+    {Restart, Shutdown, Type} = {transient, infinity, supervisor},
+    {Module,
+     {?MODULE, start_timed_supervisor, [SupModule, Module, Args]},
+     Restart, Shutdown, Type, [SupModule]}.
 
 child_spec(Module) ->
     child_spec(Module, []).
