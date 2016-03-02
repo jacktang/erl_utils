@@ -32,6 +32,9 @@
 -export([beginning_of_day/1, midday/1, end_of_day/1]).
 -export([is_older_by/3, is_sooner_by/3]).
 -export([subtract/2, add/2]).
+-export([parse_datetime/1]).
+
+-include_lib("parsec/include/parsec.hrl").
 
 %%%===================================================================
 %%% API
@@ -259,3 +262,117 @@ update_last_day({Y, M, D}) ->
         false ->
             {Y, M, D}
     end.
+
+parse_datetime(Datetime) when is_binary(Datetime) ->
+    parse_datetime(binary_to_list(Datetime));
+parse_datetime(Datetime) ->
+    case parsec:parse(Datetime, p_datetime()) of
+        {ok, Datetime, _} ->
+            {ok, Datetime};
+        {error, pzero} ->
+            {error, parse_failed}
+    end.
+
+p_datetime() ->
+    parsec:bind(
+      parsec:choice([p_date_with_sep(), p_date_without_sep()]),
+      fun(Date) ->
+              parsec:choice([parsec:bind(
+                              parsec:do([parsec:many1(parsec:char($ )), p_time_with_dot()]),
+                              fun({Time, Dot}) ->
+                                      DateTime = #{date => Date, time => Time},
+                                      NDateTime = 
+                                          case Dot of
+                                              undefined ->
+                                                  DateTime;
+                                              {Digits, Dec} ->
+                                                  DateTime#{after_dot => Digits, dec => Dec}
+                                          end,
+                                      parsec:return(NDateTime)
+                              end),
+                            parsec:return(#{date => Date})])
+      end).
+                                    
+p_integer() ->
+    parsec:bind(?DIGITS,
+                fun (N) -> 
+                        parsec:return(list_to_integer(N))
+                end).
+
+p_digit() ->
+    parsec:bind(?DIGIT,
+                fun (N) -> 
+                        parsec:return(list_to_integer([N]))
+                end).      
+
+p_int_with_dec() ->
+    parsec:bind(parsec:many(p_digit()),
+                fun(Digits) ->
+                        Len = length(Digits),
+                        Num = 
+                            lists:foldl(
+                              fun(N, Acc) ->
+                                      N + Acc * 10
+                              end, 0, Digits),
+                        parsec:return({Num, Len})
+                end).
+
+p_date_with_sep() ->
+    parsec:bind(
+      parsec:sep_by(p_integer(), parsec:char($-)),
+      fun([Y, M, D]) ->
+              parsec:return({Y, M, D});
+         (_Other) ->
+              parsec:pzero()
+      end).
+
+p_date_without_sep() ->
+    parsec:bind(parsec:many(p_digit()),
+                fun([Y1, Y2, Y3, Y4, M1, M2, D1, D2]) ->
+                        Date = {Y1 * 1000 + Y2 * 100 + Y3 * 10 + Y4,
+                                M1 * 10 + M2,
+                                D1 * 10 + D2},
+                        parsec:return(Date);
+                   ([Y1, Y2, M1, M2]) ->
+                        parsec:return({2000 + Y1 * 10 + Y2, M1 * 10 + M2})
+                end).
+
+p_time() ->
+    parsec:bind(
+      parsec:sep_by(p_integer(), parsec:char($:)),
+      fun([HH, MM, SS]) ->
+              parsec:return({HH, MM, SS});
+         (_Other) ->
+              parsec:pzero()
+      end).
+
+p_time_with_dot() ->
+    parsec:bind(
+      p_time(),
+      fun(Time) ->
+              parsec:bind(parsec:many(parsec:do([parsec:char($.), p_int_with_dec()])),
+                          fun([]) ->
+                                  parsec:return({Time, undefined});
+                             ([AfterDot]) ->
+                                  parsec:return({Time, AfterDot})
+                          end)
+      end).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
