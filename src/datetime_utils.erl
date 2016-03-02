@@ -267,8 +267,8 @@ parse_datetime(Datetime) when is_binary(Datetime) ->
     parse_datetime(binary_to_list(Datetime));
 parse_datetime(Datetime) ->
     case parsec:parse(Datetime, p_datetime()) of
-        {ok, Datetime, _} ->
-            {ok, Datetime};
+        {ok, V, _} ->
+            {ok, V};
         {error, pzero} ->
             {error, parse_failed}
     end.
