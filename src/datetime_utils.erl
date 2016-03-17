@@ -67,10 +67,6 @@ epoch_to_localtime(Epoch) ->
     Now = epoch_to_now(Epoch),
     calendar:now_to_local_time(Now).
 
-epoch_to_utctime(Epoch) ->
-    Now = epoch_to_now(Epoch),
-    calendar:now_to_universal_time(Now).
-
 date_to_epoch(Date) ->
     datetime_to_epoch({Date, {0,0,0} }).
 datetime_to_epoch({Date, Time}) ->
@@ -274,23 +270,33 @@ parse_datetime(Datetime) ->
     end.
 
 p_datetime() ->
+    parsec:choice([
+                   parsec:bind(
+                     parsec:choice([p_date_with_sep(), p_date_without_sep()]),
+                     fun(Date) ->
+                             parsec:choice([parsec:bind(
+                                              p_time_all(),
+                                              fun(Time) ->
+                                                      parsec:return(Time#{date => Date})
+                                                          
+                                              end),
+                                            parsec:return(#{date => Date})])
+                     end),
+                   p_time_all()]).
+
+p_time_all() ->
     parsec:bind(
-      parsec:choice([p_date_with_sep(), p_date_without_sep()]),
-      fun(Date) ->
-              parsec:choice([parsec:bind(
-                              parsec:do([parsec:many1(parsec:char($ )), p_time_with_dot()]),
-                              fun({Time, Dot}) ->
-                                      DateTime = #{date => Date, time => Time},
-                                      NDateTime = 
-                                          case Dot of
-                                              undefined ->
-                                                  DateTime;
-                                              {Digits, Dec} ->
-                                                  DateTime#{after_dot => Digits, dec => Dec}
-                                          end,
-                                      parsec:return(NDateTime)
-                              end),
-                            parsec:return(#{date => Date})])
+      parsec:do([parsec:many1(parsec:char($ )), p_time_with_dot()]),
+      fun({Time, Dot}) ->
+              DateTime = #{time => Time},
+              NDateTime = 
+                  case Dot of
+                      undefined ->
+                          DateTime;
+                      {Digits, Dec} ->
+                          DateTime#{after_dot => Digits, dec => Dec}
+                  end,
+              parsec:return(NDateTime)
       end).
                                     
 p_integer() ->
@@ -334,7 +340,9 @@ p_date_without_sep() ->
                                 D1 * 10 + D2},
                         parsec:return(Date);
                    ([Y1, Y2, M1, M2]) ->
-                        parsec:return({2000 + Y1 * 10 + Y2, M1 * 10 + M2})
+                        parsec:return({2000 + Y1 * 10 + Y2, M1 * 10 + M2});
+                   (_Other) ->
+                        parsec:pzero()
                 end).
 
 p_time() ->
