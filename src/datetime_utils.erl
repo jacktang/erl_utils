@@ -275,7 +275,7 @@ p_datetime() ->
                      parsec:choice([p_date_with_sep(), p_date_without_sep()]),
                      fun(Date) ->
                              parsec:choice([parsec:bind(
-                                              p_time_all(),
+                                              parsec:do([p_time_with_dot(), p_time_all()]),
                                               fun(Time) ->
                                                       parsec:return(Time#{date => Date})
                                                           
@@ -286,7 +286,7 @@ p_datetime() ->
 
 p_time_all() ->
     parsec:bind(
-      parsec:do([parsec:many1(parsec:char($ )), p_time_with_dot()]),
+      parsec:do([p_time_with_dot()]),
       fun({Time, Dot}) ->
               DateTime = #{time => Time},
               NDateTime = 
