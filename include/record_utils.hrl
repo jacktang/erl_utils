@@ -31,3 +31,20 @@
                 list_to_tuple([Tag|L])
         end
        )(Proplist))).
+
+-define(PLTR(Record, Proplist),
+        record_utils:proplists_to_record(Proplist, record_info(fields, Record), #Record{})
+       ).
+
+-define(PLTR(Record, Proplist, Fun),
+        record_utils:proplists_to_record(Proplist, Fun, record_info(fields, Record), #Record{})
+       ).
+
+
+-define(RTPL(RName, Record),
+        record_utils:record_to_proplists(Record, record_info(fields, RName))
+       ).
+
+-define(RTPL(RName, Record, Fun),
+        record_utils:record_to_proplists(Record, Fun, record_info(fields, RName))
+       ).

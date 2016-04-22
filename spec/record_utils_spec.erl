@@ -8,6 +8,7 @@
 -record(bar2, {a, b}).
 -record(bar3, {a, b, c = "C"}).
 
+
 spec() ->
     describe("Converts record to proplist",
              fun() ->
@@ -66,3 +67,4 @@ spec() ->
                               ?assertEqual(#bar3{a="A1", b="B1"}, R2)
                       end)
                    end).
+                        
