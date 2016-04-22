@@ -94,7 +94,7 @@ record_to_proplists(Record, Fun, Fields) ->
     Pairs = lists:zip(Fields, Values),
     lists:reverse(
       lists:foldl(
-        fun(K, V, Acc) ->
+        fun({K, V}, Acc) ->
                 key_value_converter(K, V, Acc, Fun, Record)
         end, [], Pairs)).
 
