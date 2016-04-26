@@ -72,7 +72,7 @@ proplists_to_record(Proplists, Fun, Fields, Default) ->
         lists:foldl(
           fun ({K,V}, Acc) ->
                   NK = to_atom(K),
-                  key_value_converter(K, V, Acc, Fun, Proplists)
+                  key_value_converter(NK, V, Acc, Fun, Proplists)
           end, maps:new(), Proplists),
     L = 
         lists:map(
