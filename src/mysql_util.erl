@@ -68,7 +68,7 @@ update_statement(Tab, Type, Attrs) ->
         end,
     list_to_binary(
       lists:flatten([Head, " ", 
-                     Tab, " set ", string:join(SetBlock, ", ")])).
+                     to_list(Tab), " set ", string:join(SetBlock, ", ")])).
 
 generate_attr_block(Attrs) ->
     lists:map(
