@@ -70,7 +70,8 @@ proplists_to_record(Proplists, Fun, Fields, Default) ->
     DefaultMap = maps:from_list(lists:zip(Fields, Values)),
     RecMap =
         lists:foldl(
-          fun ({K,V}, Acc) -> 
+          fun ({K,V}, Acc) ->
+                  NK = to_atom(K),
                   key_value_converter(K, V, Acc, Fun, Proplists)
           end, maps:new(), Proplists),
     L = 
@@ -131,6 +132,12 @@ key_value_converter(K, V, Acc, Fun, Record) when is_atom(K) ->
 key_value_converter(K, _V, _Acc, _Fun, _Record) ->
     throw({invalid_key, K}).
 
+to_atom(K) when is_atom(K) ->
+    K;
+to_atom(K) when is_list(K) ->
+    list_to_atom(K);
+to_atom(K) when is_binary(K) ->
+    binary_to_atom(K, utf8).
 
 append_values([KV|T], Acc) ->
     NAcc = append_value(KV, Acc),
