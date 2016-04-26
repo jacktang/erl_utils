@@ -112,7 +112,7 @@ key_value_converter(K, V, Acc, Fun, Record) when is_binary(K) ->
 key_value_converter(K, V, Acc, Fun, Record) when is_atom(K) ->
     case Fun of
         undefined ->
-            [{K, V}|Acc];
+            append_value({K, V}, Acc);
         Fun when is_function(Fun, 1)  ->
             case Fun(K) of
                 undefined ->
