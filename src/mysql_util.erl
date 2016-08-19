@@ -9,7 +9,7 @@
 -module(mysql_util).
 
 %% API
--export([query_statement/2, query_statement/3, update_statement/3]).
+-export([query_statement/2, query_statement/3, update_statement/3, delete_statement/2]).
 
 %%%===================================================================
 %%% API
@@ -64,11 +64,25 @@ update_statement(Tab, Type, Attrs) ->
             replace ->
                 "replace into";
             update ->
-                "update"
+                "update";
+            delete ->
+                "delete from"
         end,
     list_to_binary(
       lists:flatten([Head, " ", 
                      to_list(Tab), " set ", string:join(SetBlock, ", ")])).
+
+delete_statement(Tab, Attrs) ->
+    ConditionStr = 
+        case Attrs of
+            [] ->
+                undefined;
+            _ ->
+                ["where ", string:join(generate_attr_block(Attrs), " and ")]
+        end,
+    list_to_binary(string:join(
+                     filter_empty(["delete from",
+                                   to_list(Tab), ConditionStr]), " ")).
 
 generate_attr_block(Attrs) ->
     lists:map(
