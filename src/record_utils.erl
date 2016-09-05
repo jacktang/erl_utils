@@ -36,12 +36,15 @@ record_to_proplist(Rec, Fields) -> % Rec should be a record
 record_to_proplist(Rec, Fields, RequiredFields)  -> % Rec should be a record
     Values = tl(tuple_to_list(Rec)),
     [Fs, Vs] = lists:foldl(
-                 fun(Field, [FAcc0, VAcc0]) ->
+                 fun(F, [FAcc0, VAcc0]) ->
+                         {Field, Target, Formatter} = formatter(F),
                          case lists_utils:index_of(Field, Fields) of
-                             not_found -> throw(badarg);
+                             not_found -> 
+                                 throw({invalid_field, Field});
                              Index ->
                                  V = lists:nth(Index, Values),
-                                 [ [Field|FAcc0], [V|VAcc0] ]
+                                 NV = format(Formatter, V, Rec),
+                                 [ [Target|FAcc0], [NV|VAcc0] ]
                          end
                  end, [[], []], RequiredFields),
     lists:zip(Fs, Vs).
@@ -56,13 +59,21 @@ proplist_to_record(Record, Proplist, Fields) ->
     Defaults = lists:zip(Fields, Values),
     L = lists:map(fun ({K,V}) -> proplists:get_value(K, Proplist, V) end, Defaults),
     list_to_tuple([Tag|L]).
-
-
 %%--------------------------------------------------------------------
 %% @doc
 %% @spec
 %% @end
 %%--------------------------------------------------------------------
+formatter(Field) when is_atom(Field) ->
+    {Field, Field, fun identity/1};
+formatter({Field, Target}) ->
+    {Field, Target, fun identity/1};
+formatter({Field, Target, Formatter}) when is_function(Formatter) ->
+    {Field, Target, Formatter}.
+
+identity(Value) ->
+    Value.
+
 proplists_to_record(Proplists, Fields, Default) ->
     proplists_to_record(Proplists, undefined, Fields, Default).
 proplists_to_record(Proplists, Fun, Fields, Default) ->
@@ -102,6 +113,12 @@ record_to_proplists(Record, Fun, Fields) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+format(Formatter, Value, _Record) when is_function(Formatter, 1) ->
+    Formatter(Value);
+format(Formatter, Value, Record) when is_function(Formatter, 2) ->
+    Formatter(Value, Record);
+format(Formatter, Value, Record) ->
+    throw({invalid_formatter, Formatter, Value, Record}).
 
 key_value_converter(K, V, Acc, Fun, Record) when is_list(K) ->
     NK = list_to_atom(K),
@@ -126,8 +143,25 @@ key_value_converter(K, V, Acc, Fun, Record) when is_atom(K) ->
         Fun when is_function(Fun, 3) ->
             Pairs =  Fun(K, V, Record),
             append_values(Pairs, Acc);
-        _Other ->
-            throw(invalid_converter)
+        ConveterList when is_list(ConveterList) ->
+            case proplists:get_value(K, ConveterList) of
+                undefined ->
+                    Acc;
+                ignore__ ->
+                    Acc;
+                true ->
+                    append_value({K, V}, Acc);
+                NK when is_atom(NK) ->
+                    append_value({NK, V}, Acc);
+                Formatter when is_function(Formatter) ->
+                    NV = format(Formatter, V, Record),
+                    append_value({K, NV}, Acc);
+                {NK, Formatter} when is_atom(NK), is_function(Formatter) ->
+                    NV = format(Formatter, V, Record),
+                    append_value({NK, NV}, Acc)
+            end;
+        Other ->
+            throw({invalid_converter, Other})
     end;
 key_value_converter(K, _V, _Acc, _Fun, _Record) ->
     throw({invalid_key, K}).
