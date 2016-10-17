@@ -161,7 +161,7 @@ key_value_converter(K, V, Acc, Fun, Record) when is_atom(K) ->
                     append_value({NK, NV}, Acc)
             end;
         Other ->
-            throw({invalid_converter, Other})
+            exit({invalid_converter, Other})
     end;
 key_value_converter(K, _V, _Acc, _Fun, _Record) ->
     throw({invalid_key, K}).
