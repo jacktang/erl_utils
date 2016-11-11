@@ -14,6 +14,7 @@
 -export([proplist_to_record/3]).
 -export([proplists_to_record/3, proplists_to_record/4]).
 -export([record_to_proplists/2, record_to_proplists/3]).
+-export([convert_by_convert_list/5]).
 
 -include("record_utils.hrl").
 
