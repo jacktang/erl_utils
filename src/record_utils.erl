@@ -113,12 +113,16 @@ record_to_proplists(Record, Fun, Fields) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-format(Formatter, Value, _Record) when is_function(Formatter, 1) ->
+format(Formatter, _Key, _NKey, Value, _Record) when is_function(Formatter, 1) ->
     Formatter(Value);
-format(Formatter, Value, Record) when is_function(Formatter, 2) ->
+format(Formatter, _Key, _NKey, Value, Record) when is_function(Formatter, 2) ->
     Formatter(Value, Record);
-format(Formatter, Value, Record) ->
-    throw({invalid_formatter, Formatter, Value, Record}).
+format(Formatter, Key, _NKey, Value, Record) when is_function(Formatter, 3) ->
+    Formatter(Key, Value, Record);
+format(Formatter, Key, NKey, Value, Record) when is_function(Formatter, 4) ->
+    Formatter(Key, NKey, Value, Record);
+format(Formatter, Key, _NKey, Value, Record) ->
+    throw({invalid_formatter, Formatter, Key, Value, Record}).
 
 key_value_converter(K, V, Acc, Fun, Record) when is_list(K) ->
     NK = list_to_atom(K),
@@ -144,27 +148,34 @@ key_value_converter(K, V, Acc, Fun, Record) when is_atom(K) ->
             Pairs =  Fun(K, V, Record),
             append_values(Pairs, Acc);
         ConveterList when is_list(ConveterList) ->
-            case proplists:get_value(K, ConveterList) of
-                undefined ->
-                    Acc;
-                ignore__ ->
-                    Acc;
-                true ->
-                    append_value({K, V}, Acc);
-                NK when is_atom(NK) ->
-                    append_value({NK, V}, Acc);
-                Formatter when is_function(Formatter) ->
-                    NV = format(Formatter, V, Record),
-                    append_value({K, NV}, Acc);
-                {NK, Formatter} when is_atom(NK), is_function(Formatter) ->
-                    NV = format(Formatter, V, Record),
-                    append_value({NK, NV}, Acc)
-            end;
+            convert_by_convert_list(K, V, Acc, ConveterList, Record);
         Other ->
             throw({invalid_converter, Other})
     end;
 key_value_converter(K, _V, _Acc, _Fun, _Record) ->
     throw({invalid_key, K}).
+
+convert_by_convert_list(K, V, Acc0, ConveterList, Record) ->
+    AllConverter = proplists:get_all_values(K, ConveterList),
+    lists:foldl(
+      fun(Converter, Acc) ->
+              case Converter of
+                  ignore__ ->
+                      Acc;
+                  true ->
+                      append_value({K, V}, Acc);
+                  NK when is_atom(NK) ->
+                      append_value({NK, V}, Acc);
+                  Formatter when is_function(Formatter) ->
+                      NV = format(Formatter, K, K, V, Record),
+                      append_value({K, NV}, Acc);
+                  {NK, Formatter} when is_atom(NK), is_function(Formatter) ->
+                      NV = format(Formatter, K, NK, V, Record),
+                      append_value({NK, NV}, Acc)
+              end
+      end, Acc0, AllConverter).
+            
+                
 
 to_atom(K) when is_atom(K) ->
     K;
