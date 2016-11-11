@@ -99,7 +99,7 @@ proplists_to_record(Proplists, Fun, Fields, Default) ->
     list_to_tuple([Tag|L]).
 
 record_to_proplists(Record, Fields) ->
-    record_to_proplist(Record, undefined, Fields).
+    record_to_proplists(Record, undefined, Fields).
 
 record_to_proplists(Record, Fun, Fields) ->
     Values = tl(tuple_to_list(Record)),
@@ -161,7 +161,7 @@ key_value_converter(K, V, Acc, Fun, Record) when is_atom(K) ->
                     append_value({NK, NV}, Acc)
             end;
         Other ->
-            exit({invalid_converter, Other})
+            throw({invalid_converter, Other})
     end;
 key_value_converter(K, _V, _Acc, _Fun, _Record) ->
     throw({invalid_key, K}).
