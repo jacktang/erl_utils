@@ -43,7 +43,7 @@ record_to_proplist(Rec, Fields, RequiredFields)  -> % Rec should be a record
                                  throw({invalid_field, Field});
                              Index ->
                                  V = lists:nth(Index, Values),
-                                 NV = format(Formatter, V, Rec),
+                                 NV = format(Formatter, Field, Field, V, Rec),
                                  [ [Target|FAcc0], [NV|VAcc0] ]
                          end
                  end, [[], []], RequiredFields),
