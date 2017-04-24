@@ -195,6 +195,8 @@ append_values(KV, Acc) ->
 
 append_value(Key, Acc) when is_atom(Key), is_list(Acc) ->
     [Key|Acc];
+append_value({_Key, undefined}, Acc) ->
+    Acc;
 append_value({Key, Value}, Acc) when is_map(Acc) ->
     maps:put(Key, Value, Acc);
 append_value({Key, Value}, Acc) when is_list(Acc) ->
